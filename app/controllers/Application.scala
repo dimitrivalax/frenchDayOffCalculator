@@ -3,6 +3,7 @@ package controllers
 import play.api.mvc._
 import play.api.libs.json.{Json}
 import org.joda.time.DateTime
+import play.api.Logger
 
 object Application extends Controller {
   
@@ -53,16 +54,22 @@ object Application extends Controller {
     val dayNumber = if (r <= 31){
       r
     } else r - 31
+    Logger.debug(" r : " + r)
+    Logger.debug(" monthNumber : " + monthNumber)
+    Logger.debug(" dayNumber : " + dayNumber)
 
-    result = result || (month == monthNumber & day == dayNumber + 1)
+    val paques =  new DateTime(year, monthNumber, dayNumber, 0, 0)
+    Logger.debug(" paques : " + paques)
+    result = result || (month == paques.plusDays(1).getMonthOfYear & day == paques.plusDays(1).getDayOfMonth)
 
     // ascension
-    val paques =  new DateTime(year, monthNumber, dayNumber, 0, 0)
+
     val ascension = paques.plusDays(39)
     result = result || (month == ascension.getMonthOfYear & day == ascension.getDayOfMonth)
 
     // pentecote
     val pentecote = paques.plusDays(50)
+    Logger.debug(" pentecote : " + pentecote)
     result = result || (month == pentecote.getMonthOfYear & day == pentecote.getDayOfMonth)
 
 

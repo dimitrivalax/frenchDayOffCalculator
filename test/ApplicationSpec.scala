@@ -26,7 +26,7 @@ class ApplicationSpec extends Specification {
 
 
       // paques
-      var result = controllers.Application.isAfrenchDayOff(2013, 3, 31)(FakeRequest())
+      var result = controllers.Application.isAfrenchDayOff(2013, 4, 1)(FakeRequest())
 
       status(result) must equalTo(OK)
       contentType(result) must beSome("application/json")
@@ -50,7 +50,7 @@ class ApplicationSpec extends Specification {
       falsebool mustEqual(false)
       falsebool mustNotEqual(true)
 
-      result = controllers.Application.isAfrenchDayOff(2014, 4, 20)(FakeRequest())
+      result = controllers.Application.isAfrenchDayOff(2014, 4, 21)(FakeRequest())
 
       status(result) must equalTo(OK)
       contentType(result) must beSome("application/json")
@@ -67,12 +67,12 @@ class ApplicationSpec extends Specification {
       status(result) must equalTo(OK)
       contentType(result) must beSome("application/json")
 
-      val jsonFalse2014 = Json.parse(contentAsString(result))
+      val jsonFalse2013 = Json.parse(contentAsString(result))
 
-      val boolFalse2014 = (jsonFalse2014 \ "isAfrenchDayOff").as[Boolean]
+      val boolFalse2013 = (jsonFalse2013 \ "isAfrenchDayOff").as[Boolean]
 
-      boolFalse2014 mustEqual(false)
-      boolFalse2014 mustNotEqual(true)
+      boolFalse2013 mustEqual(false)
+      boolFalse2013 mustNotEqual(true)
 
       // 01/01
       result = controllers.Application.isAfrenchDayOff(2013, 1, 1)(FakeRequest())

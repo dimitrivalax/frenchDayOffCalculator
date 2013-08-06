@@ -54,7 +54,7 @@ object Application extends Controller {
       r
     } else r - 31
 
-    result = result || (month == monthNumber & day == dayNumber)
+    result = result || (month == monthNumber & day == dayNumber + 1)
 
     // ascension
     val paques =  new DateTime(year, monthNumber, dayNumber, 0, 0)

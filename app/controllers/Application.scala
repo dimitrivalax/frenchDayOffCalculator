@@ -1,8 +1,8 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{Json}
+import org.joda.time.DateTime
 
 object Application extends Controller {
   
@@ -11,7 +11,26 @@ object Application extends Controller {
   }
 
   def isAfrenchDayOff(year: Int, month: Int, day: Int) = Action {
-    var result = false;
+
+    var result = isPaquesAscensionPentecote(year, month, day);
+
+    result = result || isAFixedDayOff(month, day)
+
+    Ok(Json.obj("isAfrenchDayOff" -> result)).as("application/json").withHeaders(ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
+
+  }
+
+  private def isAFixedDayOff(month: Int, day: Int) : Boolean = (month, day) match {
+    case (1, 1) | (5, 1) | (5, 8) | (7, 14) | (8, 15) | (11, 1) | (11, 11) | (12, 25) => true
+    case _ => false
+  }
+
+  private def isPaquesAscensionPentecote(year: Int, month: Int, day: Int): Boolean = {
+
+    var result = false
+
+    // Paques
+
     val g = year % 19
 
     val c: Int = year / 100
@@ -28,27 +47,28 @@ object Application extends Controller {
     val j2: Int = j1 % 7
     val r = 28 + i - j2
 
-    val montNumber = if (r <= 31){
+    val monthNumber = if (r <= 31){
       3
     } else 4
     val dayNumber = if (r <= 31){
       r
     } else r - 31
 
-    if (month == montNumber & day == dayNumber) result = true
-    else result = {
-      if (isAFixedDayOff(month, day)) true
-      else false
-    }
+    result = result || (month == monthNumber & day == dayNumber)
 
-    if (result == true) Ok(Json.obj("isAfrenchDayOff" -> true)).as("application/json")
-    else Ok(Json.obj("isAfrenchDayOff" -> false)).as("application/json")
+    // ascension
+    val paques =  new DateTime(year, monthNumber, dayNumber, 0, 0)
+    val ascension = paques.plusDays(39)
+    result = result || (month == ascension.getMonthOfYear & day == ascension.getDayOfMonth)
 
-  }
+    // pentecote
+    val pentecote = paques.plusDays(50)
+    result = result || (month == pentecote.getMonthOfYear & day == pentecote.getDayOfMonth)
 
-  private def isAFixedDayOff(month: Int, day: Int) : Boolean = (month, day) match {
-    case (1, 1) | (5, 1) | (5, 8) | (7, 14) | (8, 15) | (11, 1) | (11, 11) | (12, 25) => true
-    case _ => false
+
+
+
+     result
   }
   
 }

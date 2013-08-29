@@ -4,3 +4,8 @@ This is a scala Play! app which calculate the french day off.
 Content:
 
 /isAfrenchDayOff/year: Int/month: Int/day: Int => renvoi du Json : {"isAfrenchDayOff" -> true/false} si la date donnée est un jours férié ou non
+
+
+Thanks to Lille university and www.ekito.fr
+
+http://www.fil.univ-lille1.fr/~wegrzyno/portail/InitProg/Doc/TP/TP6/tp6.pdf

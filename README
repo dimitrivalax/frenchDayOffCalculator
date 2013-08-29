@@ -1,5 +1,6 @@
-Api Ekito (http://ekito-api.herokuapp.com)
+frenchDayOffCalculator
+This is a scala Play! app which calculate the french day off.
 
 Content:
 
- - /isAfrenchDayOff/year: Int/month: Int/day: Int => renvoi du Json : {"isAfrenchDayOff" -> true/false} si la date donnée est un jours férié ou non
+/isAfrenchDayOff/year: Int/month: Int/day: Int => renvoi du Json : {"isAfrenchDayOff" -> true/false} si la date donnée est un jours férié ou non

@@ -13,24 +13,39 @@ object Application extends Controller {
 
   def isAfrenchDayOff(year: Int, month: Int, day: Int) = Action {
 
-    var result = isPaquesAscensionPentecote(year, month, day);
-
-    result = result || isAFixedDayOff(month, day)
-
-    Ok(Json.obj("isAfrenchDayOff" -> result)).as("application/json").withHeaders(ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
+    Ok(Json.obj("isAfrenchDayOff" -> isDayOff(year, month, day))).as("application/json").withHeaders(ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
 
   }
 
-  private def isAFixedDayOff(month: Int, day: Int) : Boolean = (month, day) match {
-    case (1, 1) | (5, 1) | (5, 8) | (7, 14) | (8, 15) | (11, 1) | (11, 11) | (12, 25) => true
+  def isDayOff(year: Int, month: Int, day: Int) =
+    isLundiDePaques(year, month, day) || isAscension(year, month, day) || isPentecote(year, month, day) || isAFixedDayOff(month, day)
+
+  def isLundiDePaques(year: Int, month: Int, day: Int) = {
+
+    val mondayOfPaques = computePaquesDate(year).plusDays(1) // the tomorrow is off
+    month == mondayOfPaques.getMonthOfYear && day == mondayOfPaques.getDayOfMonth
+  }
+
+  def isAscension(year: Int, month: Int, day: Int) = {
+    val ascension = computePaquesDate(year).plusDays(39)
+    month == ascension.getMonthOfYear && day == ascension.getDayOfMonth
+  }
+
+  def isPentecote(year: Int, month: Int, day: Int) = {
+    val pentecote = computePaquesDate(year).plusDays(50)
+    month == pentecote.getMonthOfYear && day == pentecote.getDayOfMonth
+
+  }
+
+  def isAFixedDayOff(month: Int, day: Int): Boolean = (day, month) match {
+    case (1, 1) | (1, 5) | (8, 5) | (14, 7) | (15, 8) | (1, 11) | (11, 11) | (25, 12) => true
     case _ => false
   }
 
-  private def isPaquesAscensionPentecote(year: Int, month: Int, day: Int): Boolean = {
-
-    var result = false
-
-    // Paques
+  // increment this counter if you tried to understand the following code
+  // and you finally let it as is
+  // count = 2 (Dimitri, Nicolas)
+  private def computePaquesDate(year: Int) = {
 
     val g = year % 19
 
@@ -48,34 +63,15 @@ object Application extends Controller {
     val j2: Int = j1 % 7
     val r = 28 + i - j2
 
-    val monthNumber = if (r <= 31){
+    val monthNumber = if (r <= 31) {
       3
     } else 4
-    val dayNumber = if (r <= 31){
+    val dayNumber = if (r <= 31) {
       r
     } else r - 31
-    Logger.debug(" r : " + r)
-    Logger.debug(" monthNumber : " + monthNumber)
-    Logger.debug(" dayNumber : " + dayNumber)
 
-    val paques =  new DateTime(year, monthNumber, dayNumber, 0, 0)
-    Logger.debug(" paques : " + paques)
-    result = result || (month == paques.plusDays(1).getMonthOfYear & day == paques.plusDays(1).getDayOfMonth)
+    new DateTime(year, monthNumber, dayNumber, 0, 0) // the sunday of Paques
 
-    // ascension
-
-    val ascension = paques.plusDays(39)
-    result = result || (month == ascension.getMonthOfYear & day == ascension.getDayOfMonth)
-
-    // pentecote
-    val pentecote = paques.plusDays(50)
-    Logger.debug(" pentecote : " + pentecote)
-    result = result || (month == pentecote.getMonthOfYear & day == pentecote.getDayOfMonth)
-
-
-
-
-     result
   }
   
 }
